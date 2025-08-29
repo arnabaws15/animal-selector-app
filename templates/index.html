@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Selector & File Upload</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Animal Selector & File Upload</h1>
+        
+        <div class="main-content">
+            <!-- Animal Selection Box -->
+            <div class="box animal-selection-box">
+                <h2>Select an Animal</h2>
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="animal" value="cat" class="animal-checkbox">
+                        <span class="checkmark"></span>
+                        🐱 Cat
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="animal" value="dog" class="animal-checkbox">
+                        <span class="checkmark"></span>
+                        🐶 Dog
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="animal" value="elephant" class="animal-checkbox">
+                        <span class="checkmark"></span>
+                        🐘 Elephant
+                    </label>
+                </div>
+                
+                <!-- Animal Image Display -->
+                <div class="animal-display" id="animalDisplay">
+                    <p class="placeholder-text">Select an animal to see its image</p>
+                </div>
+            </div>
+
+            <!-- File Upload Box -->
+            <div class="box file-upload-box">
+                <h2>Upload a File</h2>
+                <div class="upload-area" id="uploadArea">
+                    <input type="file" id="fileInput" accept="*/*" hidden>
+                    <div class="upload-placeholder">
+                        <div class="upload-icon">📁</div>
+                        <p>Click here to select a file or drag and drop</p>
+                        <button type="button" class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                            Choose File
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- File Information Display -->
+                <div class="file-info" id="fileInfo" style="display: none;">
+                    <h3>File Information:</h3>
+                    <div class="info-item">
+                        <strong>Name:</strong> <span id="fileName"></span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Size:</strong> <span id="fileSize"></span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Type:</strong> <span id="fileType"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/script.js"></script>
+</body>
+</html>
