@@ -1,4 +1,12 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // AI Question elements
+    const questionInput = document.getElementById('questionInput');
+    const askButton = document.getElementById('askButton');
+    const aiResponse = document.getElementById('aiResponse');
+    const responseContent = document.getElementById('responseContent');
+    const btnText = askButton.querySelector('.btn-text');
+    const btnLoading = askButton.querySelector('.btn-loading');
+    
     // Animal selection elements
     const animalCheckboxes = document.querySelectorAll('.animal-checkbox');
     const animalDisplay = document.getElementById('animalDisplay');
@@ -10,6 +18,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const fileName = document.getElementById('fileName');
     const fileSize = document.getElementById('fileSize');
     const fileType = document.getElementById('fileType');
+    
+    // Handle AI question submission
+    askButton.addEventListener('click', askGeminiAI);
+    questionInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+            askGeminiAI();
+        }
+    });
     
     // Handle animal checkbox selection (only one at a time)
     animalCheckboxes.forEach(checkbox => {
@@ -159,6 +175,82 @@ document.addEventListener('DOMContentLoaded', function() {
             fileInput.click();
         }
     });
+    
+    // Ask Gemini AI function
+    async function askGeminiAI() {
+        const question = questionInput.value.trim();
+        if (!question) {
+            alert('Please enter a question first!');
+            return;
+        }
+        
+        try {
+            // Show loading state
+            askButton.disabled = true;
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'flex';
+            aiResponse.style.display = 'none';
+            
+            const response = await fetch('/api/ask-gemini', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ question: question })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                // Display successful response
+                responseContent.innerHTML = '';
+                
+                // Add text response
+                if (data.response.text) {
+                    const textElement = document.createElement('div');
+                    textElement.textContent = data.response.text;
+                    textElement.style.marginBottom = '15px';
+                    responseContent.appendChild(textElement);
+                }
+                
+                // Add images if any
+                if (data.response.images && data.response.images.length > 0) {
+                    data.response.images.forEach(imageBase64 => {
+                        const imgElement = document.createElement('img');
+                        imgElement.src = `data:image/jpeg;base64,${imageBase64}`;
+                        imgElement.alt = 'Generated image';
+                        responseContent.appendChild(imgElement);
+                    });
+                }
+                
+                aiResponse.style.display = 'block';
+                
+                // Clear the input
+                questionInput.value = '';
+            } else {
+                // Show error
+                responseContent.innerHTML = `
+                    <div class="error-message">
+                        <strong>Error:</strong> ${data.error || 'Failed to get response from Gemini AI'}
+                    </div>
+                `;
+                aiResponse.style.display = 'block';
+            }
+        } catch (error) {
+            // Show network/connection error
+            responseContent.innerHTML = `
+                <div class="error-message">
+                    <strong>Connection Error:</strong> ${error.message}
+                </div>
+            `;
+            aiResponse.style.display = 'block';
+        } finally {
+            // Reset button state
+            askButton.disabled = false;
+            btnText.style.display = 'block';
+            btnLoading.style.display = 'none';
+        }
+    }
 });
 
 // Global function for reload button (needed because of inline onclick)

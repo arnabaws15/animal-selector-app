@@ -2,16 +2,29 @@ from fastapi import FastAPI, File, UploadFile, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 import os
+import base64
+import google.generativeai as genai
 from pathlib import Path
 
 app = FastAPI()
+
+# Configure Gemini AI
+# You'll need to set this environment variable with your API key
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Templates
 templates = Jinja2Templates(directory="templates")
+
+# Pydantic models
+class QuestionRequest(BaseModel):
+    question: str
 
 @app.get("/")
 async def read_root(request: Request):
@@ -50,6 +63,48 @@ async def upload_file(file: UploadFile = File(...)):
         return JSONResponse(
             status_code=500,
             content={"success": False, "error": str(e)}
+        )
+
+@app.post("/api/ask-gemini")
+async def ask_gemini(request: QuestionRequest):
+    """Ask Gemini AI a question and get response"""
+    try:
+        if not GEMINI_API_KEY:
+            return JSONResponse(
+                status_code=500,
+                content={
+                    "success": False, 
+                    "error": "Gemini API key not configured. Please set GEMINI_API_KEY environment variable."
+                }
+            )
+        
+        # Initialize the Gemini model
+        model = genai.GenerativeModel('gemini-2.0-flash-exp')
+        
+        # Generate content using the model
+        response = model.generate_content(request.question)
+        
+        # Extract text response
+        response_text = response.text if response.text else ""
+        
+        # Check if response contains images (Gemini might include base64 images)
+        images = []
+        
+        return JSONResponse(content={
+            "success": True,
+            "response": {
+                "text": response_text,
+                "images": images
+            }
+        })
+        
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={
+                "success": False,
+                "error": f"Error communicating with Gemini AI: {str(e)}"
+            }
         )
 
 if __name__ == "__main__":

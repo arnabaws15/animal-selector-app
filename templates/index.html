@@ -3,14 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animal Selector & File Upload</title>
+    <title>AI Assistant with Gemini</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Animal Selector & File Upload</h1>
+        <h1>AI Assistant with Gemini</h1>
         
         <div class="main-content">
+            <!-- AI Question Box -->
+            <div class="box ai-question-box">
+                <h2>Ask Gemini AI</h2>
+                <div class="question-area">
+                    <textarea 
+                        id="questionInput" 
+                        class="question-input" 
+                        placeholder="Ask me anything! I can help with questions, generate content, explain concepts, and more..."
+                        rows="4"
+                    ></textarea>
+                    <button type="button" class="ask-btn" id="askButton">
+                        <span class="btn-text">Ask Gemini</span>
+                        <span class="btn-loading" style="display: none;">
+                            <div class="loading"></div>
+                            Thinking...
+                        </span>
+                    </button>
+                </div>
+                
+                <!-- AI Response Display -->
+                <div class="ai-response" id="aiResponse" style="display: none;">
+                    <h3>Gemini's Response:</h3>
+                    <div class="response-content" id="responseContent">
+                        <!-- Response will be displayed here -->
+                    </div>
+                </div>
+            </div>
+
             <!-- Animal Selection Box -->
             <div class="box animal-selection-box">
                 <h2>Select an Animal</h2>
